@@ -12,6 +12,11 @@ export const metadata = {
   title: 'Smart Crop Disease Detection',
   description: 'Detect crop diseases instantly using AI',
   manifest: '/manifest.json',
+  icons: {
+    icon: '/logo2.png', // favicon or tab icon
+    shortcut: '/logo2.png', // optional shortcut icon
+    apple: '/logo2.png', // for Apple devices
+  },
 }
 
 export default function RootLayout({ children }) {

@@ -53,7 +53,7 @@ export default function Home() {
   return (
     <div className=" bg-white">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-green-50 via-emerald-50 to-lime-50 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-green-50 via-emerald-50 to-lime-50 -mt-10 overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         

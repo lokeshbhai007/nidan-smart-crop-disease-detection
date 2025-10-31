@@ -54,17 +54,17 @@ export default function LoginPage() {
 
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email address
+              Phone No.
             </label>
             <input
               id="email"
               name="email"
-              type="email"
+              type="number"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="appearance-none relative block w-full px-3 py-3 border border-gray-300 rounded-2xl placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-              placeholder="Enter your email"
+              placeholder="Enter your Phone No."
             />
           </div>
 

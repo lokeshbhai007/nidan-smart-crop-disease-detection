@@ -6,10 +6,10 @@ import jwt from 'jsonwebtoken'
 
 export async function POST(request) {
   try {
-    const { name, email, password } = await request.json()
+    const { name, email, password, language } = await request.json()
 
     // Validation
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !language) {
       return NextResponse.json(
         { message: 'All fields are required' },
         { status: 400 }
@@ -43,6 +43,7 @@ export async function POST(request) {
       name,
       email,
       password: hashedPassword,
+      language,
       createdAt: new Date(),
     })
 
@@ -50,7 +51,7 @@ export async function POST(request) {
     const token = jwt.sign(
       { 
         userId: result.insertedId.toString(),
-        email 
+        email
       },
       process.env.JWT_SECRET || 'your-fallback-secret-key',
       { expiresIn: '7d' }
@@ -61,6 +62,7 @@ export async function POST(request) {
       id: result.insertedId,
       name,
       email,
+      language,
     }
 
     // Create response with token cookie
