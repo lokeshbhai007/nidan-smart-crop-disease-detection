@@ -67,7 +67,7 @@ export async function POST(req) {
       conversationHistory
     )
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
 
     let result
     if (image) {
@@ -102,13 +102,16 @@ export async function POST(req) {
       timestamp: new Date()
     })
 
+    // ✅ Return response with clean text for TTS
     return NextResponse.json({
       response,
+      responseText: response, // Clean text specifically for TTS
       weatherData,
       marketData,
       cropAdvice,
       userLocation: locationInfo.displayName,
-      locationDetails: locationInfo
+      locationDetails: locationInfo,
+      language: userLanguage // Include language for TTS voice selection
     })
 
   } catch (error) {
@@ -299,13 +302,14 @@ ${advisory.recommendations.join('\n')}
 
 IMPORTANT INSTRUCTIONS:
 1. Respond ONLY in ${languageName} language
-2. Be conversational and friendly, like talking to a fellow farmer, dont need to talk about how are you etc.
-3. Provide practical, actionable advice specific to their exact location
-4. Consider the current weather and market conditions
-5. Use simple language that farmers can easily understand
-6. Include specific measurements, timings, and quantities
-7. Warn about weather-related risks if relevant
-8. Suggest optimal market timing based on current prices
+2. Be direct and professional - NO greetings, NO "how are you", NO casual openings
+3. Start directly with answering the question or analyzing the image
+4. Provide practical, actionable advice specific to their exact location
+5. Consider the current weather and market conditions
+6. Use simple language that farmers can easily understand
+7. Include specific measurements, timings, and quantities
+8. Warn about weather-related risks if relevant
+9. Suggest optimal market timing based on current prices
 ${conversationContext}
 
 Provide helpful, accurate farming advice based on the user's question.`

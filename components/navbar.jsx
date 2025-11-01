@@ -34,9 +34,10 @@ export default function Navbar() {
     { href: '/', label: 'Home' },
     { href: '/detection', label: 'Detect Disease' },
     { href: '/chatbot', label: 'AI Assistant' },
-    { href: '/history', label: 'History' },
+    // { href: '/history', label: 'History' },
     // { href: '/dashboard', label: 'Dashboard' },
-    { href: '/about-us', label: 'About us' },
+    { href: '/expert-hub', label: 'Expert Hub' },
+    { href: '/about-us', label: 'About Us' },
   ]
 
   return (
@@ -52,14 +53,14 @@ export default function Navbar() {
             <div className="relative w-22 h-22 transition-transform group-hover:scale-110 duration-300">
               <Image
                 src="/logo2.png"
-                alt="Nidan Logo"
+                alt="Nidaan Logo"
                 fill
                 className="object-contain bg-blend-color-burn"
                 priority
               />
             </div>
             <span className="font-bold -ml-3 text-3xl text-green-800 group-hover:text-green-600 transition-colors">
-              Nidan
+              Nidaan
             </span>
           </Link>
 
