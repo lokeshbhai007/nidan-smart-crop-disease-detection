@@ -333,31 +333,7 @@ export default function AfterLoginPage() {
           className="grid gap-6"
         >
           {/* Quick Actions */}
-          <motion.div variants={itemVariants} className="grid md:grid-cols-2 gap-4">
-            <Link href="/detection">
-              <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-2xl font-bold mb-2">Detect Disease</h3>
-                    <p className="text-green-100">Upload crop images for instant AI analysis</p>
-                  </div>
-                  <span className="text-5xl">📸</span>
-                </div>
-              </div>
-            </Link>
-
-            <Link href="/chatbot">
-              <div className="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-2xl font-bold mb-2">AI Assistant</h3>
-                    <p className="text-blue-100">Get expert farming advice instantly</p>
-                  </div>
-                  <span className="text-5xl">💬</span>
-                </div>
-              </div>
-            </Link>
-          </motion.div>
+          
 
           {/* Weather Section */}
           {weatherData && (

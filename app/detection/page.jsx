@@ -3,11 +3,211 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mic, MicOff, Send, MapPin, Cloud, Droplets, Wind, ThermometerSun, CheckCircle, AlertCircle } from 'lucide-react'
+import { Mic, MicOff, Send, MapPin, Cloud, Droplets, Wind, ThermometerSun, CheckCircle, AlertCircle, X, ShoppingCart, Star, ExternalLink, TrendingUp, Package } from 'lucide-react'
 
+// Medicine Modal Component
+function MedicineRecommendationModal({ isOpen, onClose, result }) {
+  const [sortBy, setSortBy] = useState('rating')
+  
+  if (!isOpen || !result) return null
+
+  const allMedicines = []
+  result.treatments?.forEach(treatment => {
+    if (treatment.products && treatment.products.length > 0) {
+      treatment.products.forEach(product => {
+        allMedicines.push({
+          ...product,
+          treatmentName: treatment.name,
+          priority: treatment.priority,
+          effectiveness: treatment.effectiveness
+        })
+      })
+    }
+  })
+
+  const sortedMedicines = [...allMedicines].sort((a, b) => {
+    if (sortBy === 'rating') {
+      return parseFloat(b.rating) - parseFloat(a.rating)
+    } else {
+      return b.price - a.price
+    }
+  })
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-6 text-white relative">
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-full transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <h2 className="text-2xl font-bold mb-2 pr-12">Expert Medicine Recommendations</h2>
+            <p className="text-green-50">For: {result.disease}</p>
+            <div className="mt-3 flex items-center gap-2">
+              <Package className="w-5 h-5" />
+              <span className="font-semibold">{sortedMedicines.length} Products Available</span>
+            </div>
+          </div>
+
+          <div className="p-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+            <p className="text-sm text-gray-600 font-medium">Sort by:</p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSortBy('rating')}
+                className={`px-4 py-2 rounded-xl font-medium text-sm transition-colors ${
+                  sortBy === 'rating'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <Star className="w-4 h-4 inline mr-1" />
+                Highest Rating
+              </button>
+              <button
+                onClick={() => setSortBy('price')}
+                className={`px-4 py-2 rounded-xl font-medium text-sm transition-colors ${
+                  sortBy === 'price'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <TrendingUp className="w-4 h-4 inline mr-1" />
+                Highest Price
+              </button>
+            </div>
+          </div>
+
+          <div className="overflow-y-auto max-h-[calc(90vh-200px)] p-6">
+            <div className="space-y-4">
+              {sortedMedicines.map((medicine, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="bg-white border-2 border-gray-200 rounded-2xl p-5 hover:border-green-400 hover:shadow-lg transition-all"
+                >
+                  <div className="flex gap-4">
+                    <div className="flex-shrink-0">
+                      <img
+                        src={medicine.image}
+                        alt={medicine.name}
+                        className="w-28 h-28 object-cover rounded-xl border-2 border-gray-200"
+                      />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-bold text-gray-900 mb-1 line-clamp-2">
+                            {medicine.name}
+                          </h3>
+                          <p className="text-sm text-gray-600 mb-2">
+                            For: <span className="font-semibold text-green-700">{medicine.treatmentName}</span>
+                          </p>
+                        </div>
+                        
+                        {medicine.priority && (
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                            medicine.priority === 'High' ? 'bg-red-100 text-red-700' :
+                            medicine.priority === 'Medium' ? 'bg-amber-100 text-amber-700' :
+                            'bg-blue-100 text-blue-700'
+                          }`}>
+                            {medicine.priority} Priority
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-4 mb-3">
+                        <div className="flex items-center gap-1">
+                          <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
+                          <span className="font-bold text-gray-900">{medicine.rating}</span>
+                          <span className="text-sm text-gray-500">/5</span>
+                        </div>
+
+                        <div className="flex items-center gap-1">
+                          <span className="text-2xl font-bold text-green-600">
+                            ₹{medicine.price}
+                          </span>
+                        </div>
+
+                        {medicine.inStock ? (
+                          <span className="text-sm text-green-600 font-medium">✓ In Stock</span>
+                        ) : (
+                          <span className="text-sm text-red-600 font-medium">Out of Stock</span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-between mb-3">
+                        <p className="text-sm text-gray-600">
+                          Seller: <span className="font-medium">{medicine.seller}</span>
+                        </p>
+                        {medicine.effectiveness && (
+                          <span className="text-sm font-semibold text-blue-600">
+                            {medicine.effectiveness} Effective
+                          </span>
+                        )}
+                      </div>
+
+                      <a
+                        href={medicine.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+                          medicine.inStock
+                            ? 'bg-green-600 hover:bg-green-700 text-white'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                        onClick={(e) => !medicine.inStock && e.preventDefault()}
+                      >
+                        <ShoppingCart className="w-4 h-4" />
+                        {medicine.inStock ? 'Buy Now' : 'Out of Stock'}
+                        {medicine.inStock && <ExternalLink className="w-4 h-4" />}
+                      </a>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {sortedMedicines.length === 0 && (
+              <div className="text-center py-12">
+                <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-600 font-medium">No products available</p>
+              </div>
+            )}
+          </div>
+
+          <div className="p-4 bg-blue-50 border-t border-blue-200">
+            <p className="text-sm text-blue-800 text-center">
+              💡 <strong>Tip:</strong> Consult with an agricultural expert before purchasing. Prices and availability may vary.
+            </p>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  )
+}
+
+// Main Detection Page Component
 export default function EnhancedDetectionPage() {
   const [selectedFiles, setSelectedFiles] = useState([])
-  const [stage, setStage] = useState('upload') // upload, crop-selection, farmer-input, analysis, results
+  const [stage, setStage] = useState('upload')
   const [detectedCrops, setDetectedCrops] = useState([])
   const [selectedCrop, setSelectedCrop] = useState(null)
   const [farmerInput, setFarmerInput] = useState('')
@@ -18,15 +218,15 @@ export default function EnhancedDetectionPage() {
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
   const [recognition, setRecognition] = useState(null)
+  const [showMedicineModal, setShowMedicineModal] = useState(false)
 
-  // Initialize speech recognition
   useEffect(() => {
     if (typeof window !== 'undefined' && 'webkitSpeechRecognition' in window) {
       const SpeechRecognition = window.webkitSpeechRecognition
       const recognitionInstance = new SpeechRecognition()
       recognitionInstance.continuous = false
       recognitionInstance.interimResults = false
-      recognitionInstance.lang = 'hi-IN' // Default to Hindi
+      recognitionInstance.lang = 'hi-IN'
       
       recognitionInstance.onresult = (event) => {
         const transcript = event.results[0][0].transcript
@@ -46,7 +246,6 @@ export default function EnhancedDetectionPage() {
     }
   }, [])
 
-  // Get user location and weather
   const fetchLocationAndWeather = async () => {
     try {
       if (!navigator.geolocation) {
@@ -60,7 +259,6 @@ export default function EnhancedDetectionPage() {
       const { latitude, longitude } = position.coords
       setLocation({ latitude, longitude })
 
-      // Fetch weather data (using Open-Meteo API - free, no API key needed)
       const weatherResponse = await fetch(
         `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code&timezone=auto`
       )
@@ -81,7 +279,6 @@ export default function EnhancedDetectionPage() {
     }
   }
 
-  // Handle file selection
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files)
     setSelectedFiles(files)
@@ -89,14 +286,12 @@ export default function EnhancedDetectionPage() {
     setError(null)
   }
 
-  // Initial crop detection
   const handleInitialAnalysis = async () => {
     if (selectedFiles.length === 0) return
 
     setLoading(true)
     setError(null)
 
-    // Fetch location and weather
     await fetchLocationAndWeather()
 
     try {
@@ -134,13 +329,11 @@ export default function EnhancedDetectionPage() {
     }
   }
 
-  // Handle crop selection
   const handleCropSelect = (crop) => {
     setSelectedCrop(crop)
     setStage('farmer-input')
   }
 
-  // Toggle voice recording
   const toggleRecording = () => {
     if (!recognition) {
       alert('Voice recognition not supported in your browser')
@@ -156,7 +349,6 @@ export default function EnhancedDetectionPage() {
     }
   }
 
-  // Final analysis with all data
   const handleFinalAnalysis = async () => {
     if (!selectedCrop || !farmerInput.trim()) {
       setError('Please select a crop and provide symptoms description')
@@ -187,7 +379,7 @@ export default function EnhancedDetectionPage() {
           farmerInput: farmerInput,
           weatherData: weatherData,
           location: location,
-          userId: 'demo-user' // Replace with actual user ID
+          userId: 'demo-user'
         }),
       })
 
@@ -207,7 +399,6 @@ export default function EnhancedDetectionPage() {
     }
   }
 
-  // Reset everything
   const handleReset = () => {
     setSelectedFiles([])
     setStage('upload')
@@ -218,12 +409,12 @@ export default function EnhancedDetectionPage() {
     setLocation(null)
     setResult(null)
     setError(null)
+    setShowMedicineModal(false)
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-lime-50 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
-        {/* Progress Steps */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -250,7 +441,6 @@ export default function EnhancedDetectionPage() {
           </div>
         </motion.div>
 
-        {/* Error Message */}
         <AnimatePresence>
           {error && (
             <motion.div
@@ -265,7 +455,6 @@ export default function EnhancedDetectionPage() {
           )}
         </AnimatePresence>
 
-        {/* Upload Stage */}
         {stage === 'upload' && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -311,7 +500,6 @@ export default function EnhancedDetectionPage() {
           </motion.div>
         )}
 
-        {/* Crop Selection Stage */}
         {stage === 'crop-selection' && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -348,14 +536,12 @@ export default function EnhancedDetectionPage() {
           </motion.div>
         )}
 
-        {/* Farmer Input Stage */}
         {stage === 'farmer-input' && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
-            {/* Selected Crop */}
             <div className="bg-white rounded-2xl p-6 shadow-lg border border-green-100">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -369,7 +555,6 @@ export default function EnhancedDetectionPage() {
               </div>
             </div>
 
-            {/* Weather Data */}
             {weatherData && (
               <div className="bg-white rounded-2xl p-6 shadow-lg border border-blue-100">
                 <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -409,7 +594,6 @@ export default function EnhancedDetectionPage() {
               </div>
             )}
 
-            {/* Farmer Input */}
             <div className="bg-white rounded-2xl p-6 shadow-lg border border-green-100">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Describe the Problem</h3>
               <p className="text-sm text-gray-600 mb-4">Tell us what symptoms you're seeing (use voice or text)</p>
@@ -418,7 +602,7 @@ export default function EnhancedDetectionPage() {
                 <textarea
                   value={farmerInput}
                   onChange={(e) => setFarmerInput(e.target.value)}
-                  placeholder="पत्तियों पर पीले धब्बे हैं, फसल सूख रही है..."
+                  placeholder="Tell about the problem..."
                   className="w-full p-4 pr-20 border-2 border-gray-300 rounded-2xl focus:border-green-500 focus:outline-none min-h-32 resize-none"
                 />
                 <div className="absolute bottom-4 right-4 flex gap-2">
@@ -453,7 +637,6 @@ export default function EnhancedDetectionPage() {
           </motion.div>
         )}
 
-        {/* Analysis Stage */}
         {stage === 'analysis' && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -469,7 +652,6 @@ export default function EnhancedDetectionPage() {
           </motion.div>
         )}
 
-        {/* Results Stage */}
         {stage === 'results' && result && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -482,7 +664,6 @@ export default function EnhancedDetectionPage() {
             </div>
 
             <div className="p-6 space-y-6">
-              {/* Accuracy Score */}
               <div className="bg-gradient-to-r from-emerald-50 to-green-50 p-6 rounded-2xl border-2 border-green-200">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-lg font-bold text-gray-900">Diagnosis Accuracy</h3>
@@ -491,7 +672,6 @@ export default function EnhancedDetectionPage() {
                 <p className="text-sm text-gray-600">Based on image analysis, farmer observations, and weather patterns</p>
               </div>
 
-              {/* Disease Detection */}
               <div className="p-6 bg-red-50 rounded-2xl border-2 border-red-200">
                 <h3 className="text-xl font-bold text-red-800 mb-2">{result.disease}</h3>
                 <p className="text-sm text-gray-700 mb-3">{result.description}</p>
@@ -505,7 +685,6 @@ export default function EnhancedDetectionPage() {
                 </div>
               </div>
 
-              {/* Contributing Factors */}
               {result.contributingFactors && (
                 <div className="p-6 bg-blue-50 rounded-2xl border border-blue-200">
                   <h3 className="font-bold text-gray-900 mb-3">Weather & Environmental Factors</h3>
@@ -520,7 +699,6 @@ export default function EnhancedDetectionPage() {
                 </div>
               )}
 
-              {/* Treatment Recommendations */}
               <div className="p-6 bg-green-50 rounded-2xl border border-green-200">
                 <h3 className="font-bold text-gray-900 mb-4">Recommended Treatments</h3>
                 <div className="space-y-3">
@@ -533,7 +711,6 @@ export default function EnhancedDetectionPage() {
                 </div>
               </div>
 
-              {/* Action Buttons */}
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={handleReset}
@@ -542,15 +719,23 @@ export default function EnhancedDetectionPage() {
                   New Analysis
                 </button>
                 <button
-                  className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition-colors"
+                  onClick={() => setShowMedicineModal(true)}
+                  className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition-colors flex items-center justify-center gap-2"
                 >
-                  Ask Expert
+                  <ShoppingCart className="w-5 h-5" />
+                  Recommended Medicine
                 </button>
               </div>
             </div>
           </motion.div>
         )}
       </div>
+
+      <MedicineRecommendationModal 
+        isOpen={showMedicineModal}
+        onClose={() => setShowMedicineModal(false)}
+        result={result}
+      />
     </div>
   )
 }
